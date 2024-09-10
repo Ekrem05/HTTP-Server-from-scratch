@@ -55,6 +55,9 @@ int main()
     }
 
     //Temporary Socket object for accepting client connections
+
+    //Currently accepting only one connection at a time
+    //TODO: Make it so it can listen to multiple connections and stay alive
     SOCKET ClientSocket;
     ClientSocket = accept(servsock, NULL, NULL);
     if (ClientSocket == INVALID_SOCKET)
@@ -77,7 +80,7 @@ int main()
             "HTTP/1.1 200 OK\r\n"
             "Content-Type: text/plain\r\n"
             "Content-Length: 31\r\n"
-            "Connection: keep-alive\r\n"
+            "Connection: close\r\n"
             "\r\n"
             "Hello from my first HTTP server!";
 
