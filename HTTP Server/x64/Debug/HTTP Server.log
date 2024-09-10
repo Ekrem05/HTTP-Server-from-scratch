@@ -1,0 +1,3 @@
+﻿  HTTP Server.c
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\HTTP Server.c(58,12): warning C4101: 'ClientSocket': unreferenced local variable
+  HTTP Server.vcxproj -> C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\x64\Debug\HTTP Server.exe
