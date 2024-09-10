@@ -56,5 +56,49 @@ int main()
 
     //Temporary Socket object for accepting client connections
     SOCKET ClientSocket;
+    ClientSocket = accept(servsock, NULL, NULL);
+    if (ClientSocket == INVALID_SOCKET)
+    {
+        printf("accept failed: %d\n", WSAGetLastError());
+        closesocket(servsock);
+        WSACleanup();
+        return 1;
+    }
+
+    //Receive data from the connected client socket
+
+    char buff[512];
+
+    while (recv(ClientSocket, buff, sizeof(buff) - 1, 0))
+    {
+        
+       printf("%s",buff);
+        const char* httpResponse =
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/plain\r\n"
+            "Content-Length: 31\r\n"
+            "Connection: keep-alive\r\n"
+            "\r\n"
+            "Hello from my first HTTP server!";
+
+        if (send(ClientSocket, httpResponse, (int) strlen(httpResponse), 0) == SOCKET_ERROR)
+        {
+            printf("Send failed: %d\n", WSAGetLastError());
+        }
+       
+    }
+    if (shutdown(ClientSocket, SD_SEND) == SOCKET_ERROR)
+    {
+        printf("shutdown failed: %d\n", WSAGetLastError());
+        return 1;
+    }
+    closesocket(servsock);
+    WSACleanup();
+   
+}
+
+
+void printString(char* chars, int len)
+{
 
 }
