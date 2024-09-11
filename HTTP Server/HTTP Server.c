@@ -3,7 +3,7 @@
 #include <ws2tcpip.h>  // For inet_pton and related functions
 
 #pragma comment(lib, "ws2_32.lib")  // Link Winsock library
-
+DWORD WINAPI handleClient(LPVOID lpParam);
 int main()
 {
     WSADATA wsaData;
@@ -35,6 +35,7 @@ int main()
 
     // Create socket
     SOCKET servsock = socket(addrInfo->ai_family,addrInfo->ai_socktype,addrInfo->ai_protocol);
+
     if (servsock == INVALID_SOCKET)
     {
         printf("Error creating a socket.\n");
@@ -58,50 +59,67 @@ int main()
 
     //Currently accepting only one connection at a time
     //TODO: Make it so it can listen to multiple connections and stay alive
-    SOCKET ClientSocket;
-    ClientSocket = accept(servsock, NULL, NULL);
-    if (ClientSocket == INVALID_SOCKET)
+
+
+    while (1)
     {
-        printf("accept failed: %d\n", WSAGetLastError());
-        closesocket(servsock);
-        WSACleanup();
-        return 1;
-    }
+        SOCKET* clientSockPtr= malloc(sizeof(SOCKET));
 
-    //Receive data from the connected client socket
+        *clientSockPtr = accept(servsock, NULL, NULL);
 
-    char buff[512];
-
-    while (recv(ClientSocket, buff, sizeof(buff) - 1, 0))
-    {
-        
-       printf("%s",buff);
-        const char* httpResponse =
-            "HTTP/1.1 200 OK\r\n"
-            "Content-Type: text/plain\r\n"
-            "Content-Length: 31\r\n"
-            "Connection: close\r\n"
-            "\r\n"
-            "Hello from my first HTTP server!";
-
-        if (send(ClientSocket, httpResponse, (int) strlen(httpResponse), 0) == SOCKET_ERROR)
+        if (clientSockPtr == INVALID_SOCKET)
         {
-            printf("Send failed: %d\n", WSAGetLastError());
+            printf("accept failed: %d\n", WSAGetLastError());
+            closesocket(servsock);
+            WSACleanup();
+            return 1;
         }
-       
+        else
+        {
+            int threadId;
+            HANDLE handler=CreateThread(NULL,0, handleClient, clientSockPtr,0,&threadId);
+            CloseHandle(handler);
+        }
     }
-    if (shutdown(ClientSocket, SD_SEND) == SOCKET_ERROR)
-    {
-        printf("shutdown failed: %d\n", WSAGetLastError());
-        return 1;
-    }
+
     closesocket(servsock);
     WSACleanup();
-   
+
 }
 
-
-void printString(char* chars, int len)
+DWORD handleClient(LPVOID lpParam)
 {
+    SOCKET clientSocket = *(SOCKET*) lpParam;
+    char buff[512];
+    free(lpParam);
 
+    if (recv(clientSocket, buff, sizeof(buff) - 1, 0) == SOCKET_ERROR)
+    {
+        printf("Recv failed: %d\n", WSAGetLastError());
+        return 1;
+    }
+
+        printf("%s", buff);
+
+    const char* httpResponse =
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: text/plain\r\n"
+        "Content-Length: 31\r\n"
+        "Connection: close\r\n"
+        "\r\n"
+        "Hello from my first HTTP server!";
+
+        if (send(clientSocket, httpResponse, (int) strlen(httpResponse), 0) == SOCKET_ERROR)
+        {
+            printf("Send failed: %d\n", WSAGetLastError());
+            return 1;
+        }
+
+        
+        if (shutdown(clientSocket, SD_SEND) == SOCKET_ERROR)
+        {
+            printf("shutdown failed: %d\n", WSAGetLastError());
+            return 1;
+        }
+        closesocket(clientSocket);
 }

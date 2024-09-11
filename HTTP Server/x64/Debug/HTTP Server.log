@@ -1,2 +1,4 @@
 ﻿  HTTP Server.c
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\HTTP Server.c(70,27): warning C4047: '==': 'SOCKET *' differs in levels of indirection from 'SOCKET'
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\HTTP Server.c(125,1): warning C4715: 'handleClient': not all control paths return a value
   HTTP Server.vcxproj -> C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\x64\Debug\HTTP Server.exe
