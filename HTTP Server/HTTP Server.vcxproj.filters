@@ -18,5 +18,16 @@
     <ClCompile Include="HTTP Server.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="router.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="server.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="server.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
