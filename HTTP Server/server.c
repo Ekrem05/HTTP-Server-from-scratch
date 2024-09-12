@@ -203,8 +203,9 @@ getHeaders(Header* headers,int length, char* buff)
     char* additionalHeadersBegin = strstr(buff, "\r\n");
     char* additionalHeadersEnd = strstr(buff,"\r\n\r\n");
     
-
-    char* currentLine = additionalHeadersBegin+2;
+    int headersSize = additionalHeadersEnd - additionalHeadersBegin;
+    char currentLine[MAX_ADDITIONAL_HEADERS_LENGTH];
+    strncpy_s(&currentLine, MAX_ADDITIONAL_HEADERS_LENGTH, additionalHeadersBegin+2, headersSize+2);
     while (currentLine)
     {
         if (strcmp("\r\n", currentLine) == 0)

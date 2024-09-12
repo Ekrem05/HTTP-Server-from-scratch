@@ -4,9 +4,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define MAX_KEY_LENGTH 256
-#define MAX_VALUE_LENGTH 1024
-#define MAX_NUMBER_OF_HEADERS 100
+#define MAX_KEY_LENGTH 256 //key of header
+#define MAX_VALUE_LENGTH 1024 //value of header
+#define MAX_NUMBER_OF_HEADERS 30
+#define MAX_ADDITIONAL_HEADERS_LENGTH 8120
 #define MAX_ROUTES 100
 #define MAX_URL_LENGTH 2000
 
