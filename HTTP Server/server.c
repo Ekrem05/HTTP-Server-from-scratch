@@ -11,7 +11,7 @@ struct ThreadParams
 };
 DWORD WINAPI handleClient(LPVOID lpParam);
 
-int initialize_server(const ServerConfig* config)
+int run(ServerConfig* config)
 {
     WSADATA wsaData;
 
@@ -69,21 +69,26 @@ int initialize_server(const ServerConfig* config)
 
     while (1)
     {
-        SOCKET* clientSockPtr = malloc(sizeof(SOCKET));
+        struct ThreadParams* params = (struct ThreadParams*) malloc(sizeof(struct ThreadParams));
+        if (params == NULL)
+        {
+            printf("Memory allocation failed\n");
+            continue; // Skip this iteration and try to accept a new connection
+        }
 
-        *clientSockPtr = accept(servsock, NULL, NULL);
+        params->clientSocket = accept(servsock, NULL, NULL);
+        params->config = config; // Set the config
 
-        if (clientSockPtr == INVALID_SOCKET)
+        if (params->clientSocket == INVALID_SOCKET)
         {
             printf("accept failed: %d\n", WSAGetLastError());
-            closesocket(servsock);
-            WSACleanup();
-            return 1;
+            free(params);
+            continue;
         }
         else
         {
             int threadId;
-            HANDLE handler = CreateThread(NULL, 0, handleClient, clientSockPtr, 0, &threadId);
+            HANDLE handler = CreateThread(NULL, 0, handleClient, params, 0, &threadId);
             CloseHandle(handler);
         }
     }
@@ -91,6 +96,15 @@ int initialize_server(const ServerConfig* config)
     closesocket(servsock);
     WSACleanup();
 
+    return 0;
+}
+
+int addRoute(ServerConfig* config, HttpMethod method, char* route, RouteHandler* handler )
+{
+    Route newRoute;
+    newRoute.method = method;
+    strcpy_s(newRoute.route, MAX_ROUTE_NAME_LENGTH,route);
+    newRoute.handler = handler;
     return 0;
 }
 
@@ -121,11 +135,12 @@ DWORD handleClient(LPVOID lpParam)
 
     int headerLength = headerEnd - buff + 4;  
 
-    //printf("Headers:\n%.*s\n", headerLength, buff);
-    Header headers[MAX_NUMBER_OF_HEADERS];
-    getHeaders(&headers, headerLength,buff);
-    //router(buff, config);
-    //Pass to the router
+    
+    Request request;
+    strcpy_s(&request.body,sizeof(request.body), &buff); //pass the whole request as the body for now
+    
+    getHeaders(&request.headers, headerLength, buff);
+    router(&request, &config);
 
     const char* httpResponse =
         "HTTP/1.1 200 OK\r\n"
@@ -149,10 +164,11 @@ DWORD handleClient(LPVOID lpParam)
     }
     closesocket(clientSocket);
 }
-getHeaders(Header* headers,int length, char* buff)
+
+int getHeaders(Header* headers,int length, char* buff)
 {
     char* methodNameEnd = strchr(buff, ' ');
-    if (methodNameEnd == NULL) return;
+    if (methodNameEnd == NULL) return 0;
     int methodNameSize = methodNameEnd - buff;
     
     char methodName[8];
@@ -176,7 +192,7 @@ getHeaders(Header* headers,int length, char* buff)
 
 
     char *routeNameEnd = strchr(methodNameEnd+1,' ');
-    if (routeNameEnd == NULL) return;
+    if (routeNameEnd == NULL) return 0;
 
     int routeNameSize = routeNameEnd - methodNameEnd;
 
@@ -189,7 +205,7 @@ getHeaders(Header* headers,int length, char* buff)
     headersCount++;
 
     char *httpVersionEnd = strstr(routeNameEnd +1,"\r\n");
-    if (httpVersionEnd == NULL) return;
+    if (httpVersionEnd == NULL) return 0;
 
     int httpVersionSize = httpVersionEnd - routeNameEnd;
 
@@ -213,7 +229,7 @@ getHeaders(Header* headers,int length, char* buff)
             break;
         }
         char* endOfCurrentLine = strstr(currentLine,"\r\n");
-        if (endOfCurrentLine == NULL) return;
+        if (endOfCurrentLine == NULL) return 0;
 
         char* endOfKey = strchr(currentLine,':');
         int keySize = endOfKey-currentLine;

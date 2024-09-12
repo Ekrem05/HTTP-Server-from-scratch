@@ -1,35 +1,37 @@
 ﻿  server.c
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\winerror.h(227,9): warning C4005: 'ERROR_SUCCESS': macro redefinition
   (compiling source file 'server.c')
-      C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.h(15,9):
+      C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.h(17,9):
       see previous definition of 'ERROR_SUCCESS'
   
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(14,43): warning C4028: formal parameter 1 different from declaration
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(76,27): warning C4047: '==': 'SOCKET *' differs in levels of indirection from 'SOCKET'
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(126,5): warning C4013: 'getHeaders' undefined; assuming extern returning int
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(122,41): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(155,32): warning C4033: 'getHeaders' must return a value
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(159,15): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[8]'
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(159,15): warning C4024: 'strncpy_s': different types for formal and actual parameter 1
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(179,31): warning C4033: 'getHeaders' must return a value
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(184,15): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[2000]'
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(184,15): warning C4024: 'strncpy_s': different types for formal and actual parameter 1
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(192,33): warning C4033: 'getHeaders' must return a value
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(197,15): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[20]'
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(197,15): warning C4024: 'strncpy_s': different types for formal and actual parameter 1
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(208,15): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[8120]'
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(208,15): warning C4024: 'strncpy_s': different types for formal and actual parameter 1
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(216,39): warning C4033: 'getHeaders' must return a value
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(221,19): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[256]'
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(221,19): warning C4024: 'strncpy_s': different types for formal and actual parameter 1
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(225,19): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[1024]'
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(225,19): warning C4024: 'strncpy_s': different types for formal and actual parameter 1
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(156,40): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(181,38): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(194,42): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(206,44): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(219,31): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(223,42): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(241,1): warning C4716: 'getHeaders': must return a value
-C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(151,1): warning C4715: 'handleClient': not all control paths return a value
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(107,22): warning C4047: '=': 'RouteHandler' differs in levels of indirection from 'RouteHandler *'
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(140,14): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[8120]'
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(140,14): warning C4024: 'strcpy_s': different types for formal and actual parameter 1
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(140,50): warning C4047: 'function': 'const char *' differs in levels of indirection from 'char (*)[8192]'
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(140,50): warning C4024: 'strcpy_s': different types for formal and actual parameter 3
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(142,5): warning C4013: 'getHeaders' undefined; assuming extern returning int
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(143,12): warning C4133: 'function': incompatible types - from 'Request *' to 'const char *'
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(143,22): warning C4047: 'function': 'ServerConfig *' differs in levels of indirection from 'ServerConfig **'
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(143,22): warning C4024: 'router': different types for formal and actual parameter 2
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(136,41): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(175,15): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[8]'
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(175,15): warning C4024: 'strncpy_s': different types for formal and actual parameter 1
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(200,15): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[2000]'
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(200,15): warning C4024: 'strncpy_s': different types for formal and actual parameter 1
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(213,15): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[20]'
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(213,15): warning C4024: 'strncpy_s': different types for formal and actual parameter 1
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(224,15): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[8120]'
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(224,15): warning C4024: 'strncpy_s': different types for formal and actual parameter 1
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(237,19): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[256]'
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(237,19): warning C4024: 'strncpy_s': different types for formal and actual parameter 1
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(241,19): warning C4047: 'function': 'char *' differs in levels of indirection from 'char (*)[1024]'
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(241,19): warning C4024: 'strncpy_s': different types for formal and actual parameter 1
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(172,40): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(197,38): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(210,42): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(222,44): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(235,31): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(239,42): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(166,1): warning C4715: 'handleClient': not all control paths return a value
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.c(257,1): warning C4715: 'getHeaders': not all control paths return a value
   HTTP Server.vcxproj -> C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\x64\Debug\HTTP Server.exe

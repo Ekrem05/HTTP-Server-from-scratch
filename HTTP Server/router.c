@@ -1,7 +1,8 @@
 #include "server.h"
 #include "errors.h"
-
-int register_route(HttpMethod method, const char* route, RouteHandler handler,ServerConfig* config)
+#include <stdio.h>
+#include <ws2tcpip.h>
+int add(HttpMethod method, const char* route, RouteHandler handler,ServerConfig* config)
 {
 	if (config->routeCount >= MAX_ROUTES)
 	{
@@ -15,13 +16,18 @@ int register_route(HttpMethod method, const char* route, RouteHandler handler,Se
 		}
 	}
 	config->routes->method = method;
-	config->routes->route  = route;
+	strcpy_s(config->routes[config->routeCount].route, MAX_ROUTE_NAME_LENGTH,route);
 	config->routes->handler = handler;
 	config->routeCount++;
 
 	return 1;
 }
-void router(const char* request, ServerConfig* config)
+void router(Request* request, ServerConfig* config)
 {
-
+	char method[10];
+	char route[240];
+	for (size_t i = 0; i < config->routeCount; i++)
+	{
+		if(strcmp(config->routes[i].route,request->headers.)
+	}
 }

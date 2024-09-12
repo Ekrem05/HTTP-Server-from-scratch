@@ -7,9 +7,11 @@
 #define MAX_KEY_LENGTH 256 //key of header
 #define MAX_VALUE_LENGTH 1024 //value of header
 #define MAX_NUMBER_OF_HEADERS 30
+#define MAX_BODY_LENGTH 8120
 #define MAX_ADDITIONAL_HEADERS_LENGTH 8120
 #define MAX_ROUTES 100
 #define MAX_URL_LENGTH 2000
+#define MAX_ROUTE_NAME_LENGTH 64
 
 // Error Codes
 #define ERROR_SUCCESS 0
@@ -27,10 +29,10 @@ extern "C" {
 
     typedef enum
     {
-        METHOD_GET,
-        METHOD_POST,
-        METHOD_PUT,
-        METHOD_DELETE,
+        GET,
+        POST,
+        PUT,
+        DELETE,
     } HttpMethod;
 
     typedef void (*RouteHandler)(const char* request, char* response, size_t* response_len);
@@ -38,7 +40,7 @@ extern "C" {
     typedef struct
     {
         HttpMethod method;
-        const char* route;
+        char route[MAX_ROUTE_NAME_LENGTH];
         RouteHandler handler;
     } Route;
 
@@ -57,19 +59,22 @@ extern "C" {
 
     typedef struct
     {
-        Header* headers;
-        char* body;
+        HttpMethod method;
+        Header headers[MAX_NUMBER_OF_HEADERS];
+        char body[MAX_BODY_LENGTH];
     } Request;
 
     typedef struct
     {
+        HttpMethod method;
         Header* headers;
         char* body;
     } Response;
 
-    int register_route(HttpMethod method, const char* route, RouteHandler handler, ServerConfig* config);
+    int add(HttpMethod method, const char* route, RouteHandler handler, ServerConfig* config);
     void router(const char* request, ServerConfig* config);
-    int initialize_server(ServerConfig* config);
+    int run(ServerConfig* config);
+
 
 #ifdef __cplusplus
 }
