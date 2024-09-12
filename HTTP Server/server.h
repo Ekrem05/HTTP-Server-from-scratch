@@ -5,7 +5,10 @@
 #include <stdint.h>
 
 #define MAX_KEY_LENGTH 256
-#define MAX_VALUE_LENGTH 256
+#define MAX_VALUE_LENGTH 1024
+#define MAX_NUMBER_OF_HEADERS 100
+#define MAX_ROUTES 100
+#define MAX_URL_LENGTH 2000
 
 // Error Codes
 #define ERROR_SUCCESS 0
@@ -16,7 +19,6 @@
 #define ERROR_CONNECTION_FAILED -101
 #define MAXIMUM_ROUTE_COUNT_REACHED 0
 #define ROUTE_ALREADY_EXISTS 0
-#define MAX_ROUTES 100
 
 #ifdef __cplusplus
 extern "C" {
