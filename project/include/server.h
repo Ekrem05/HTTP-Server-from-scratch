@@ -3,10 +3,9 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "hashmap.h"
 
-#define MAX_KEY_LENGTH 256 // key of header
-#define MAX_VALUE_LENGTH 1024 // value of header
+#define MAX_KEY_LENGTH 256 //key of header
+#define MAX_VALUE_LENGTH 1024 //value of header
 #define MAX_NUMBER_OF_HEADERS 30
 #define MAX_BODY_LENGTH 8120
 #define MAX_ADDITIONAL_HEADERS_LENGTH 8120
@@ -21,8 +20,8 @@
 #define ERROR_OUT_OF_MEMORY -3
 #define ERROR_NETWORK_TIMEOUT -100
 #define ERROR_CONNECTION_FAILED -101
-#define MAXIMUM_ROUTE_COUNT_REACHED -200
-#define ROUTE_ALREADY_EXISTS -201
+#define MAXIMUM_ROUTE_COUNT_REACHED 0
+#define ROUTE_ALREADY_EXISTS 0
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,32 +33,9 @@ extern "C" {
         POST,
         PUT,
         DELETE,
-        PATCH,
-        HEAD,
-        OPTIONS
     } HttpMethod;
 
-    typedef struct
-    {
-        HttpMethod method;
-        ht* headers;
-        char body[MAX_BODY_LENGTH];
-    } Request;
-
-    typedef struct
-    {
-        HttpMethod method;
-        ht* headers;
-        char body[MAX_BODY_LENGTH];
-    } Response;
-
-    typedef struct
-    {
-        Request* request;
-        Response* response;
-    } HttpContext;
-
-    typedef void (*RouteHandler)(HttpContext* context);
+    typedef void (*RouteHandler)(const char* request, char* response, size_t* response_len);
 
     typedef struct
     {
@@ -75,10 +51,30 @@ extern "C" {
         uint16_t routeCount;
     } ServerConfig;
 
-    const char* http_method_to_string(HttpMethod method);
+    typedef struct
+    {
+        char key[MAX_KEY_LENGTH];
+        char value[MAX_VALUE_LENGTH];
+    } Header;
+
+    typedef struct
+    {
+        HttpMethod method;
+        Header headers[MAX_NUMBER_OF_HEADERS];
+        char body[MAX_BODY_LENGTH];
+    } Request;
+
+    typedef struct
+    {
+        HttpMethod method;
+        Header* headers;
+        char* body;
+    } Response;
+
     int add(HttpMethod method, const char* route, RouteHandler handler, ServerConfig* config);
-    void router(Request* request, ServerConfig* config);
+    void router(const char* request, ServerConfig* config);
     int run(ServerConfig* config);
+
 
 #ifdef __cplusplus
 }

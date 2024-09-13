@@ -127,11 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="hashmap.c" />
     <ClCompile Include="HTTP Server.c" />
     <ClCompile Include="router.c" />
     <ClCompile Include="server.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="hashmap.h" />
     <ClInclude Include="server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

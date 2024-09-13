@@ -1,9 +1,8 @@
 #include "server.h"
-void myRouteHandler(const char* request, char* response, size_t* response_len)
+void myRouteHandler(HttpContext* context)
 {
-	// Handle the request and prepare the response
-	strcpy(response, "This is the response from myRouteHandler.");
-	*response_len = strlen(response);
+
+	strcpy(context->response->body, "This is the response from myRouteHandler.");
 }
 
 int main()

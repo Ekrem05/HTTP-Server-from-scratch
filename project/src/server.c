@@ -2,7 +2,6 @@
 #include <winsock2.h>
 #include <stdio.h>
 #include <ws2tcpip.h>
-#include "hashmap.h"
 
 #pragma comment(lib, "ws2_32.lib")
 struct ThreadParams
@@ -100,6 +99,15 @@ int run(ServerConfig* config)
     return 0;
 }
 
+int addRoute(ServerConfig* config, HttpMethod method, char* route, RouteHandler* handler )
+{
+    Route newRoute;
+    newRoute.method = method;
+    strcpy_s(newRoute.route, MAX_ROUTE_NAME_LENGTH,route);
+    newRoute.handler = handler;
+    return 0;
+}
+
 DWORD handleClient(LPVOID lpParam)
 {
     struct ThreadParams* params = (struct ThreadParams*) lpParam;
@@ -132,7 +140,7 @@ DWORD handleClient(LPVOID lpParam)
     strcpy_s(&request.body,sizeof(request.body), &buff); //pass the whole request as the body for now
     
     getHeaders(&request.headers, headerLength, buff);
-    router(&request, config);
+    router(&request, &config);
 
     const char* httpResponse =
         "HTTP/1.1 200 OK\r\n"
@@ -157,9 +165,8 @@ DWORD handleClient(LPVOID lpParam)
     closesocket(clientSocket);
 }
 
-int getHeaders(ht** headers,int length, char* buff)
+int getHeaders(Header* headers,int length, char* buff)
 {
-    *headers = ht_create();
     char* methodNameEnd = strchr(buff, ' ');
     if (methodNameEnd == NULL) return 0;
     int methodNameSize = methodNameEnd - buff;
@@ -178,10 +185,11 @@ int getHeaders(ht** headers,int length, char* buff)
         // Invalid method: Send 405 Method Not Allowed response
     }
     int headersCount = 0;
-    if (ht_set(*headers, "Method", methodName) == NULL)
-    {
-        return 0;
-    }
+    
+    strcpy_s(headers[headersCount].key, MAX_KEY_LENGTH,"Method");
+    strcpy_s(headers[headersCount].value, MAX_VALUE_LENGTH,methodName);
+    headersCount++;
+
 
     char *routeNameEnd = strchr(methodNameEnd+1,' ');
     if (routeNameEnd == NULL) return 0;
@@ -190,10 +198,11 @@ int getHeaders(ht** headers,int length, char* buff)
 
     char route[MAX_URL_LENGTH];
     strncpy_s(&route, MAX_URL_LENGTH, methodNameEnd+1, routeNameSize);
-    if (ht_set(*headers, "Route", route) == NULL)
-    {
-        return 0;
-    }
+    
+    strcpy_s(headers[headersCount].key, MAX_KEY_LENGTH, "Route");
+    strcpy_s(headers[headersCount].value, MAX_URL_LENGTH, route);
+
+    headersCount++;
 
     char *httpVersionEnd = strstr(routeNameEnd +1,"\r\n");
     if (httpVersionEnd == NULL) return 0;
@@ -203,11 +212,10 @@ int getHeaders(ht** headers,int length, char* buff)
     char version[20];
     strncpy_s(&version, 20, routeNameEnd + 1, httpVersionSize-1);
 
-  
-    if (ht_set(*headers, "Version", version) == NULL)
-    {
-        return 0;
-    }
+    strcpy_s(headers[headersCount].key, MAX_KEY_LENGTH, "Version");
+    strcpy_s(headers[headersCount].value, MAX_VALUE_LENGTH, version);
+    headersCount++;
+
     char* additionalHeadersBegin = strstr(buff, "\r\n");
     char* additionalHeadersEnd = strstr(buff,"\r\n\r\n");
     
@@ -231,13 +239,19 @@ int getHeaders(ht** headers,int length, char* buff)
         int valueSize = endOfCurrentLine - endOfKey;
         char headerValue[MAX_VALUE_LENGTH];
         strncpy_s(&headerValue, MAX_VALUE_LENGTH, endOfKey+2, valueSize-2);
-       
-        if (ht_set(*headers, headerKey, headerValue) == NULL)
-        {
-            return 0;
-        }
+        strcpy_s(headers[headersCount].key, sizeof(headerKey)/sizeof(char), headerKey);
+        strcpy_s(headers[headersCount].value, sizeof(headerValue) / sizeof(char), headerValue);
+        headersCount++;
         char* nextLine = strstr(currentLine, "\r\n");
 
         strcpy_s(currentLine, MAX_KEY_LENGTH+MAX_VALUE_LENGTH, nextLine+2);
     }
+
+    for (size_t i = 0; i < headersCount; i++)
+    {
+        printf("Key: %s\n",headers[i].key);
+        printf("Value: %s\n",headers[i].value);
+
+    }
+
 }

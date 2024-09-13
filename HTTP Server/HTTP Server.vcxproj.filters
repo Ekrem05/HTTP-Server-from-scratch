@@ -13,21 +13,30 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\src">
+      <UniqueIdentifier>{b7ffa1b7-f55d-4e27-8685-45f0bc37cdcd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HTTP Server.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="router.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="server.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="router.c">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="hashmap.c">
+      <Filter>Source Files\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="server.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="hashmap.h">
+      <Filter>Source Files\src</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
