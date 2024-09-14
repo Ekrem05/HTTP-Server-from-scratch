@@ -27,6 +27,10 @@ This project is a work-in-progress HTTP server implemented in C using Winsock. I
 
 ### Usage
 
+- Its recomended to visual studio and its c++ compiler
+- Download the latest release and open the .sln file for testing
+- For personal use get the source code from the "source" folder and import them in your project
+
 - Configure
 ```c
 // Choose a port for the server to run on
