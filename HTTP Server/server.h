@@ -10,6 +10,8 @@
 #define CREATED HTTP_STATUS(201, "Created")
 #define BAD_REQUEST HTTP_STATUS(400, "Bad Request")
 #define NOT_FOUND HTTP_STATUS(404, "Not Found")
+#define METHOD_NOT_ALLOWED HTTP_STATUS(405, "Method Not Allowed")
+
 
 #define MAX_KEY_LENGTH 256 
 #define MAX_VALUE_LENGTH 1024 

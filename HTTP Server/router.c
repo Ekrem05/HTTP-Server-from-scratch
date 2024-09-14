@@ -16,9 +16,9 @@ int add(HttpMethod method, const char* route, RouteHandler handler,ServerConfig*
 			return ROUTE_ALREADY_EXISTS;
 		}
 	}
-	config->routes->method = method;
-	strcpy_s(config->routes[config->routeCount].route, MAX_ROUTE_NAME_LENGTH,route);
-	config->routes->handler = handler;
+    config->routes[config->routeCount].method = method;
+    strcpy_s(config->routes[config->routeCount].route, MAX_ROUTE_NAME_LENGTH, route);
+    config->routes[config->routeCount].handler = handler;
 	config->routeCount++;
 
 	return 1;
@@ -101,20 +101,20 @@ void router(HttpContext* context, ServerConfig* config)
             }
             else
             {
-                // Return method not allowed response
-                // Set appropriate response or error handling
+                route_found = 1;
+                HttpStatus status = METHOD_NOT_ALLOWED;
+                context->response->status = status;
+                strcpy_s(context->response->body, MAX_BODY_LENGTH,"");
+                break;
             }
         }
     }
 
     if (!route_found)
     {
-        // Handle case where route is not found
-        // Set response or handle error
-    }
-    else
-    {
-
+        HttpStatus status = NOT_FOUND;
+        context->response->status = status;
+        strcpy_s(context->response->body, MAX_BODY_LENGTH, "");
     }
 }
 
