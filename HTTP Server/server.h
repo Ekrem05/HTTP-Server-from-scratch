@@ -5,8 +5,14 @@
 #include <stdint.h>
 #include "hashmap.h"
 
-#define MAX_KEY_LENGTH 256 // key of header
-#define MAX_VALUE_LENGTH 1024 // value of header
+#define HTTP_STATUS(code, message) (HttpStatus){code, message}
+#define OK HTTP_STATUS(200, "OK")
+#define CREATED HTTP_STATUS(201, "Created")
+#define BAD_REQUEST HTTP_STATUS(400, "Bad Request")
+#define NOT_FOUND HTTP_STATUS(404, "Not Found")
+
+#define MAX_KEY_LENGTH 256 
+#define MAX_VALUE_LENGTH 1024 
 #define MAX_NUMBER_OF_HEADERS 30
 #define MAX_BODY_LENGTH 8120
 #define MAX_ADDITIONAL_HEADERS_LENGTH 8120
@@ -24,9 +30,16 @@
 #define MAXIMUM_ROUTE_COUNT_REACHED -200
 #define ROUTE_ALREADY_EXISTS -201
 
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+    typedef struct
+    {
+        int code;
+        const char* message;
+    } HttpStatus;
 
     typedef enum
     {
@@ -48,7 +61,7 @@ extern "C" {
 
     typedef struct
     {
-        HttpMethod method;
+        HttpStatus status;
         ht* headers;
         char body[MAX_BODY_LENGTH];
     } Response;
@@ -79,6 +92,7 @@ extern "C" {
     int add(HttpMethod method, const char* route, RouteHandler handler, ServerConfig* config);
     void router(Request* request, ServerConfig* config);
     int run(ServerConfig* config);
+    void buildHttpResponse(char* buffer, int buffer_size, int status_code, const char* status_message, const char* content_type, const char* body);
 
 #ifdef __cplusplus
 }

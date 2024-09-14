@@ -3,6 +3,8 @@ void myRouteHandler(HttpContext* context)
 {
 
 	strcpy(context->response->body, "This is the response from myRouteHandler.");
+	HttpStatus status = OK;
+	context->response->status = status;
 }
 
 int main()

@@ -1,7 +1,8 @@
 ﻿  router.c
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\winerror.h(227,9): warning C4005: 'ERROR_SUCCESS': macro redefinition
   (compiling source file 'router.c')
-      C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.h(18,9):
+      C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\server.h(24,9):
       see previous definition of 'ERROR_SUCCESS'
   
+C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\HTTP Server\router.c(63,26): warning C4028: formal parameter 1 different from declaration
   HTTP Server.vcxproj -> C:\Users\Ekrem Beytula\Documents\Github\HTTP-Server-from-scratch\x64\Debug\HTTP Server.exe

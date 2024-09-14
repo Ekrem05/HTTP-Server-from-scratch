@@ -60,11 +60,11 @@ void safe_copy(char* dest, const char* src, size_t dest_size)
     }
 }
 
-void router(Request* request, ServerConfig* config)
+void router(HttpContext* context, ServerConfig* config)
 {
     // Retrieve headers
-    const char* method = (const char*) ht_get(request->headers, "Method");
-    const char* route = (const char*) ht_get(request->headers, "Route");
+    const char* method = (const char*) ht_get(context->request->headers, "Method");
+    const char* route = (const char*) ht_get(context->request->headers, "Route");
 
     // Check if headers are retrieved successfully
     if (!method || !route)
@@ -86,10 +86,7 @@ void router(Request* request, ServerConfig* config)
     printf("Route: '%s'\n", routeBuffer);
 
     int route_found = 0;
-    HttpContext context;
-    Response response;
-    context.request = request;
-    context.response = &response;
+    
 
     for (int i = 0; i < config->routeCount; i++)
     {
@@ -99,7 +96,7 @@ void router(Request* request, ServerConfig* config)
             if (strcmp(methodInString, methodBuffer) == 0)
             {
                 route_found = 1;
-                config->routes[i].handler(&context);
+                config->routes[i].handler(context);
                 break; // Exit loop as we found a matching route
             }
             else

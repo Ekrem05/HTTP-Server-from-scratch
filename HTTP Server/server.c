@@ -5,6 +5,9 @@
 #include "hashmap.h"
 
 #pragma comment(lib, "ws2_32.lib")
+
+
+
 struct ThreadParams
 {
     SOCKET clientSocket;
@@ -127,13 +130,20 @@ DWORD handleClient(LPVOID lpParam)
 
     int headerLength = headerEnd - buff + 4;  
 
-    
+    HttpContext context;
+    Response response;
     Request request;
+    context.request = &request;
+    context.response = &response;
+
     strcpy_s(&request.body,sizeof(request.body), &buff); //pass the whole request as the body for now
     
     getHeaders(&request.headers, headerLength, buff);
-    router(&request, config);
+    router(&context, config);
 
+
+    char responseBuff[8192];
+    buildHttpResponse(&responseBuff,8192,context.response->status.code,context.response->status.message,"text/plain",context.response->body);
     const char* httpResponse =
         "HTTP/1.1 200 OK\r\n"
         "Content-Type: text/plain\r\n"
@@ -142,7 +152,9 @@ DWORD handleClient(LPVOID lpParam)
         "\r\n"
         "Hello from my first HTTP server!";
 
-    if (send(clientSocket, httpResponse, (int) strlen(httpResponse), 0) == SOCKET_ERROR)
+    //strcpy_s(httpResponse,MAX_BODY_LENGTH, context.response->body);
+
+    if (send(clientSocket, responseBuff, (int) strlen(responseBuff), 0) == SOCKET_ERROR)
     {
         printf("Send failed: %d\n", WSAGetLastError());
         return 1;
@@ -240,4 +252,20 @@ int getHeaders(ht** headers,int length, char* buff)
 
         strcpy_s(currentLine, MAX_KEY_LENGTH+MAX_VALUE_LENGTH, nextLine+2);
     }
+}
+
+void buildHttpResponse(char* buffer, int buffer_size, int status_code, const char* status_message, const char* content_type, const char* body)
+{
+    // Calculate content length based on the body size
+    int content_length = strlen(body);
+
+    // Build the HTTP response string using snprintf to avoid buffer overflows
+    snprintf(buffer, buffer_size,
+        "HTTP/1.1 %d %s\r\n"
+        "Content-Type: %s\r\n"
+        "Content-Length: %d\r\n"
+        "Connection: close\r\n"
+        "\r\n"
+        "%s",
+        status_code, status_message, content_type, content_length, body);
 }
