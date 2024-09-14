@@ -1,9 +1,9 @@
 
-<h1 align="center">🌐🌐 HTTP Server Library in C 🌐🌐</h1>
+<h1 align="center">🌐🌐 HTTP Server in C 🌐🌐</h1>
 
 ## Overview
 
-This project is a work-in-progress HTTP server library implemented in C using Winsock. The library aims to provide a flexible and customizable framework for handling HTTP requests and responses. Users will be able to add their own routes and handle functions to extend the server's capabilities.
+This project is a work-in-progress HTTP server implemented in C using Winsock. I aim to provide a flexible and customizable framework for handling HTTP requests and responses. Users will be able to add their own routes and handle functions to extend the server's capabilities.
 
 ## Features
 
