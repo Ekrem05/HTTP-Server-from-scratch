@@ -34,7 +34,6 @@ int run(ServerConfig* config)
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_PASSIVE;
 
-    // Convert port to string
     char port_str[6];
     snprintf(port_str, sizeof(port_str), "%u", config->port);
 
@@ -45,7 +44,6 @@ int run(ServerConfig* config)
         return res;
     }
 
-    // Create socket
     SOCKET servsock = socket(addrInfo->ai_family, addrInfo->ai_socktype, addrInfo->ai_protocol);
     if (servsock == INVALID_SOCKET)
     {
@@ -77,11 +75,11 @@ int run(ServerConfig* config)
         if (params == NULL)
         {
             printf("Memory allocation failed\n");
-            continue; // Skip this iteration and try to accept a new connection
+            continue; 
         }
 
         params->clientSocket = accept(servsock, NULL, NULL);
-        params->config = config; // Set the config
+        params->config = config;
 
         if (params->clientSocket == INVALID_SOCKET)
         {
@@ -109,7 +107,7 @@ DWORD handleClient(LPVOID lpParam)
     ServerConfig* config = params->config;
     SOCKET clientSocket = params->clientSocket;
 
-    char buff[8192];
+    char buff[MAX_BODY_LENGTH];
     free(lpParam);
 
     int bytesReceived = recv(clientSocket, buff, sizeof(buff) - 1, 0);
@@ -136,23 +134,14 @@ DWORD handleClient(LPVOID lpParam)
     context.request = &request;
     context.response = &response;
 
-    strcpy_s(&request.body,sizeof(request.body), &buff); //pass the whole request as the body for now
+    strcpy_s(&request.body,sizeof(request.body), &buff);
     
     getHeaders(&request.headers, headerLength, buff);
     router(&context, config);
 
 
-    char responseBuff[8192];
-    buildHttpResponse(&responseBuff,8192,context.response->status.code,context.response->status.message,"text/plain",context.response->body);
-    const char* httpResponse =
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/plain\r\n"
-        "Content-Length: 31\r\n"
-        "Connection: close\r\n"
-        "\r\n"
-        "Hello from my first HTTP server!";
-
-    //strcpy_s(httpResponse,MAX_BODY_LENGTH, context.response->body);
+    char responseBuff[MAX_BODY_LENGTH];
+    buildHttpResponse(&responseBuff, MAX_BODY_LENGTH,context.response->status.code,context.response->status.message,context.response->contentType,context.response->body);
 
     if (send(clientSocket, responseBuff, (int) strlen(responseBuff), 0) == SOCKET_ERROR)
     {
@@ -167,6 +156,8 @@ DWORD handleClient(LPVOID lpParam)
         return 1;
     }
     closesocket(clientSocket);
+    ht_destroy(context.request->headers);
+
 }
 
 int getHeaders(ht** headers,int length, char* buff)
@@ -254,12 +245,11 @@ int getHeaders(ht** headers,int length, char* buff)
     }
 }
 
-void buildHttpResponse(char* buffer, int buffer_size, int status_code, const char* status_message, const char* content_type, const char* body)
+void buildHttpResponse(char* buffer, int buffer_size, int status_code, const char* status_message, ContentType content_type, const char* body)
 {
-    // Calculate content length based on the body size
     int content_length = strlen(body);
-
-    // Build the HTTP response string using snprintf to avoid buffer overflows
+    char* contentTypeString = content_type_to_string(content_type);
+    
     snprintf(buffer, buffer_size,
         "HTTP/1.1 %d %s\r\n"
         "Content-Type: %s\r\n"
@@ -267,5 +257,19 @@ void buildHttpResponse(char* buffer, int buffer_size, int status_code, const cha
         "Connection: close\r\n"
         "\r\n"
         "%s",
-        status_code, status_message, content_type, content_length, body);
+        status_code, status_message, contentTypeString, content_length, body);
+}
+
+const char* content_type_to_string(ContentType type)
+{
+    switch (type)
+    {
+    case CONTENT_TYPE_TEXT_PLAIN:         return "text/plain";
+    case CONTENT_TYPE_TEXT_HTML:          return "text/html";
+    case CONTENT_TYPE_APPLICATION_JSON:   return "application/json";
+    case CONTENT_TYPE_APPLICATION_XML:    return "application/xml";
+    case CONTENT_TYPE_APPLICATION_YAML:   return "application/x-yaml";
+    case CONTENT_TYPE_MULTIPART_FORM_DATA: return "multipart/form-data";
+    default:                             return "application/octet-stream";
+    }
 }

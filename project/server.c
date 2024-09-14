@@ -2,8 +2,12 @@
 #include <winsock2.h>
 #include <stdio.h>
 #include <ws2tcpip.h>
+#include "hashmap.h"
 
 #pragma comment(lib, "ws2_32.lib")
+
+
+
 struct ThreadParams
 {
     SOCKET clientSocket;
@@ -30,7 +34,6 @@ int run(ServerConfig* config)
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_PASSIVE;
 
-    // Convert port to string
     char port_str[6];
     snprintf(port_str, sizeof(port_str), "%u", config->port);
 
@@ -41,7 +44,6 @@ int run(ServerConfig* config)
         return res;
     }
 
-    // Create socket
     SOCKET servsock = socket(addrInfo->ai_family, addrInfo->ai_socktype, addrInfo->ai_protocol);
     if (servsock == INVALID_SOCKET)
     {
@@ -73,11 +75,11 @@ int run(ServerConfig* config)
         if (params == NULL)
         {
             printf("Memory allocation failed\n");
-            continue; // Skip this iteration and try to accept a new connection
+            continue; 
         }
 
         params->clientSocket = accept(servsock, NULL, NULL);
-        params->config = config; // Set the config
+        params->config = config;
 
         if (params->clientSocket == INVALID_SOCKET)
         {
@@ -99,22 +101,13 @@ int run(ServerConfig* config)
     return 0;
 }
 
-int addRoute(ServerConfig* config, HttpMethod method, char* route, RouteHandler* handler )
-{
-    Route newRoute;
-    newRoute.method = method;
-    strcpy_s(newRoute.route, MAX_ROUTE_NAME_LENGTH,route);
-    newRoute.handler = handler;
-    return 0;
-}
-
 DWORD handleClient(LPVOID lpParam)
 {
     struct ThreadParams* params = (struct ThreadParams*) lpParam;
     ServerConfig* config = params->config;
     SOCKET clientSocket = params->clientSocket;
 
-    char buff[8192];
+    char buff[MAX_BODY_LENGTH];
     free(lpParam);
 
     int bytesReceived = recv(clientSocket, buff, sizeof(buff) - 1, 0);
@@ -135,22 +128,22 @@ DWORD handleClient(LPVOID lpParam)
 
     int headerLength = headerEnd - buff + 4;  
 
-    
+    HttpContext context;
+    Response response;
     Request request;
-    strcpy_s(&request.body,sizeof(request.body), &buff); //pass the whole request as the body for now
+    context.request = &request;
+    context.response = &response;
+
+    strcpy_s(&request.body,sizeof(request.body), &buff);
     
     getHeaders(&request.headers, headerLength, buff);
-    router(&request, &config);
+    router(&context, config);
 
-    const char* httpResponse =
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/plain\r\n"
-        "Content-Length: 31\r\n"
-        "Connection: close\r\n"
-        "\r\n"
-        "Hello from my first HTTP server!";
 
-    if (send(clientSocket, httpResponse, (int) strlen(httpResponse), 0) == SOCKET_ERROR)
+    char responseBuff[MAX_BODY_LENGTH];
+    buildHttpResponse(&responseBuff, MAX_BODY_LENGTH,context.response->status.code,context.response->status.message,context.response->contentType,context.response->body);
+
+    if (send(clientSocket, responseBuff, (int) strlen(responseBuff), 0) == SOCKET_ERROR)
     {
         printf("Send failed: %d\n", WSAGetLastError());
         return 1;
@@ -163,10 +156,13 @@ DWORD handleClient(LPVOID lpParam)
         return 1;
     }
     closesocket(clientSocket);
+    ht_destroy(context.request->headers);
+
 }
 
-int getHeaders(Header* headers,int length, char* buff)
+int getHeaders(ht** headers,int length, char* buff)
 {
+    *headers = ht_create();
     char* methodNameEnd = strchr(buff, ' ');
     if (methodNameEnd == NULL) return 0;
     int methodNameSize = methodNameEnd - buff;
@@ -185,11 +181,10 @@ int getHeaders(Header* headers,int length, char* buff)
         // Invalid method: Send 405 Method Not Allowed response
     }
     int headersCount = 0;
-    
-    strcpy_s(headers[headersCount].key, MAX_KEY_LENGTH,"Method");
-    strcpy_s(headers[headersCount].value, MAX_VALUE_LENGTH,methodName);
-    headersCount++;
-
+    if (ht_set(*headers, "Method", methodName) == NULL)
+    {
+        return 0;
+    }
 
     char *routeNameEnd = strchr(methodNameEnd+1,' ');
     if (routeNameEnd == NULL) return 0;
@@ -198,11 +193,10 @@ int getHeaders(Header* headers,int length, char* buff)
 
     char route[MAX_URL_LENGTH];
     strncpy_s(&route, MAX_URL_LENGTH, methodNameEnd+1, routeNameSize);
-    
-    strcpy_s(headers[headersCount].key, MAX_KEY_LENGTH, "Route");
-    strcpy_s(headers[headersCount].value, MAX_URL_LENGTH, route);
-
-    headersCount++;
+    if (ht_set(*headers, "Route", route) == NULL)
+    {
+        return 0;
+    }
 
     char *httpVersionEnd = strstr(routeNameEnd +1,"\r\n");
     if (httpVersionEnd == NULL) return 0;
@@ -212,10 +206,11 @@ int getHeaders(Header* headers,int length, char* buff)
     char version[20];
     strncpy_s(&version, 20, routeNameEnd + 1, httpVersionSize-1);
 
-    strcpy_s(headers[headersCount].key, MAX_KEY_LENGTH, "Version");
-    strcpy_s(headers[headersCount].value, MAX_VALUE_LENGTH, version);
-    headersCount++;
-
+  
+    if (ht_set(*headers, "Version", version) == NULL)
+    {
+        return 0;
+    }
     char* additionalHeadersBegin = strstr(buff, "\r\n");
     char* additionalHeadersEnd = strstr(buff,"\r\n\r\n");
     
@@ -239,19 +234,42 @@ int getHeaders(Header* headers,int length, char* buff)
         int valueSize = endOfCurrentLine - endOfKey;
         char headerValue[MAX_VALUE_LENGTH];
         strncpy_s(&headerValue, MAX_VALUE_LENGTH, endOfKey+2, valueSize-2);
-        strcpy_s(headers[headersCount].key, sizeof(headerKey)/sizeof(char), headerKey);
-        strcpy_s(headers[headersCount].value, sizeof(headerValue) / sizeof(char), headerValue);
-        headersCount++;
+       
+        if (ht_set(*headers, headerKey, headerValue) == NULL)
+        {
+            return 0;
+        }
         char* nextLine = strstr(currentLine, "\r\n");
 
         strcpy_s(currentLine, MAX_KEY_LENGTH+MAX_VALUE_LENGTH, nextLine+2);
     }
+}
 
-    for (size_t i = 0; i < headersCount; i++)
+void buildHttpResponse(char* buffer, int buffer_size, int status_code, const char* status_message, ContentType content_type, const char* body)
+{
+    int content_length = strlen(body);
+    char* contentTypeString = content_type_to_string(content_type);
+    
+    snprintf(buffer, buffer_size,
+        "HTTP/1.1 %d %s\r\n"
+        "Content-Type: %s\r\n"
+        "Content-Length: %d\r\n"
+        "Connection: close\r\n"
+        "\r\n"
+        "%s",
+        status_code, status_message, contentTypeString, content_length, body);
+}
+
+const char* content_type_to_string(ContentType type)
+{
+    switch (type)
     {
-        printf("Key: %s\n",headers[i].key);
-        printf("Value: %s\n",headers[i].value);
-
+    case CONTENT_TYPE_TEXT_PLAIN:         return "text/plain";
+    case CONTENT_TYPE_TEXT_HTML:          return "text/html";
+    case CONTENT_TYPE_APPLICATION_JSON:   return "application/json";
+    case CONTENT_TYPE_APPLICATION_XML:    return "application/xml";
+    case CONTENT_TYPE_APPLICATION_YAML:   return "application/x-yaml";
+    case CONTENT_TYPE_MULTIPART_FORM_DATA: return "multipart/form-data";
+    default:                             return "application/octet-stream";
     }
-
 }

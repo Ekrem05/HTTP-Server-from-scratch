@@ -1,23 +1,30 @@
 #include "server.h"
-void myRouteHandler(HttpContext* context)
-{
-	strcpy(context->response->body, "This is the response from myRouteHandler.");
-	HttpStatus status = OK;
-	context->response->status = status;
-}
 void index(HttpContext* context)
 {
-	strcpy(context->response->body, "Hello from index route");
+	
+	HttpStatus status = OK;
+	Response response = {
+		.body="This is the Index endpoint",
+		.contentType=CONTENT_TYPE_TEXT_PLAIN,
+		.status=OK
+	};
+	context->response=&response;
+}
+
+void user(HttpContext* context)
+{
+	
 	HttpStatus status = OK;
 	context->response->status = status;
+	context->response->contentType = CONTENT_TYPE_APPLICATION_JSON;
+	strcpy(context->response->body, "This is the response from myRouteHandler.");
 }
 
 int main()
 {
 	ServerConfig config = {.port = 6999};
 	
-
-	add(POST,"/event", myRouteHandler, &config);
+	add(DELETE, "/user", user, &config);
 
 	add(GET, "/index", index, &config);
 
